@@ -1,9 +1,3 @@
-# LIVE DEMO AT 
-https://hospital-management-awi2.onrender.com/
-
-
-
-
 
 
 
