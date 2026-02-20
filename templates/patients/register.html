@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Registration - MedCare{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="card-header-custom">
+            <div class="icon-circle">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h2>Patient Registration</h2>
+            <p>Create your account to book appointments</p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-custom">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="form-floating-custom">
+                <label for="id_name"><i class="bi bi-person me-1"></i> Full Name</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <small class="text-danger">{{ form.name.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-floating-custom">
+                <label for="id_email"><i class="bi bi-envelope me-1"></i> Email Address</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <small class="text-danger">{{ form.email.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-floating-custom">
+                <label for="id_phone"><i class="bi bi-telephone me-1"></i> Phone Number</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                <small class="text-danger">{{ form.phone.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-floating-custom">
+                <label for="id_password"><i class="bi bi-lock me-1"></i> Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <small class="text-danger">{{ form.password.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-floating-custom">
+                <label for="id_confirm_password"><i class="bi bi-lock-fill me-1"></i> Confirm Password</label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}
+                <small class="text-danger">{{ form.confirm_password.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-custom-primary mt-3">
+                <i class="bi bi-check-circle me-2"></i>Create Account
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <p class="text-muted mb-0">
+                Already have an account? <a href="{% url 'patient_login' %}" class="link-custom">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

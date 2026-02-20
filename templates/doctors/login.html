@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Login - MedCare{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="card-header-custom">
+            <div class="icon-circle">
+                <i class="bi bi-box-arrow-in-right"></i>
+            </div>
+            <h2>Doctor Login</h2>
+            <p>Welcome back, Doctor! Access your dashboard</p>
+        </div>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="form-floating-custom">
+                <label for="id_email"><i class="bi bi-envelope me-1"></i> Email Address</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <small class="text-danger">{{ form.email.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-floating-custom">
+                <label for="id_password"><i class="bi bi-lock me-1"></i> Password</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <small class="text-danger">{{ form.password.errors.0 }}</small>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-custom-primary mt-3">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="#" class="link-custom d-block mb-2"><i class="bi bi-question-circle me-1"></i>Forgot Password?</a>
+            <p class="text-muted mb-0">
+                Don't have an account? <a href="{% url 'doctor_register' %}" class="link-custom">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

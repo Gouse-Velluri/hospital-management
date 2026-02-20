@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Doctor Dashboard - MedCare{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <!-- Welcome -->
+    <div class="dashboard-welcome">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2>Welcome, Dr. {{ doctor.name }} <span class="wave-emoji">👋</span></h2>
+                <p class="mb-0 opacity-75">{{ doctor.specialization }} · {{ doctor.experience }} years experience</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <button class="btn btn-sm btn-outline-light rounded-pill" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </button>
+                <a href="{% url 'doctor_logout' %}" class="btn btn-sm btn-outline-light rounded-pill">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-value">{{ appointments|length }}</div>
+                <div class="stat-label">Total Appointments</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(251, 146, 60, 0.15); color: #f97316;"><i class="bi bi-hourglass-split"></i></div>
+                <div class="stat-value" id="pendingCount">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-value" id="approvedCount">0</div>
+                <div class="stat-label">Approved</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i class="bi bi-clipboard2-pulse"></i></div>
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Table -->
+    <div class="card-custom">
+        <div class="card-header-custom">
+            <h5 class="mb-0"><i class="bi bi-calendar2-week me-2"></i>Your Appointments</h5>
+        </div>
+        {% if appointments %}
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Service</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Prescribed Medicines</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apt in appointments %}
+                    <tr>
+                        <td><strong>{{ apt.patient.name }}</strong></td>
+                        <td>{{ apt.service }}</td>
+                        <td>{{ apt.date|date:"M d, Y" }} · {{ apt.time|time:"h:i A" }}</td>
+                        <td>
+                            {% if apt.status == "Pending" %}
+                            <span class="badge-status badge-pending">Pending</span>
+                            {% elif apt.status == "Approved" %}
+                            <span class="badge-status badge-approved">Approved</span>
+                            {% elif apt.status == "Completed" %}
+                            <span class="badge-status badge-completed">Completed</span>
+                            {% else %}
+                            <span class="badge-status badge-cancelled">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if apt.prescriptions.all %}
+                            <div style="max-width:320px;">
+                                {% for rx in apt.prescriptions.all %}
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge-medicine-type">{{ rx.medicine.med_type }}</span>
+                                    <strong style="font-size:0.85rem;">{{ rx.medicine.name }}</strong>
+                                    <span class="text-muted" style="font-size:0.78rem;">{{ rx.frequency }} · {{ rx.duration }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted" style="font-size:0.85rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                {% if apt.status == "Pending" %}
+                                <a href="{% url 'approve_appointment' apt.id %}" class="btn btn-sm btn-outline-success rounded-pill" title="Approve">
+                                    <i class="bi bi-check-lg"></i>
+                                </a>
+                                <a href="{% url 'reject_appointment' apt.id %}" class="btn btn-sm btn-outline-danger rounded-pill" title="Reject">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                                {% endif %}
+                                {% if apt.status == "Approved" or apt.status == "Pending" %}
+                                <button class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#prescribeModal{{ apt.id }}" title="Prescribe">
+                                    <i class="bi bi-capsule"></i>
+                                </button>
+                                {% endif %}
+                                <a href="{% url 'doctor_delete_appointment' apt.id %}" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('Delete this appointment?')" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-5 text-center">
+            <i class="bi bi-calendar-x" style="font-size: 3rem; color: var(--primary);"></i>
+            <h5 class="mt-3">No Appointments Yet</h5>
+            <p class="text-muted">You don't have any appointments at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Prescribe Medicine Modals (one per appointment) -->
+{% for apt in appointments %}
+{% if apt.status == "Approved" or apt.status == "Pending" %}
+<div class="modal fade" id="prescribeModal{{ apt.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: var(--radius);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius) var(--radius) 0 0;">
+                <h5 class="modal-title text-white">
+                    <i class="bi bi-capsule me-2"></i>Prescribe for {{ apt.patient.name }}
+                    <small class="d-block opacity-75 mt-1" style="font-size:0.8rem;">{{ apt.service }} · {{ apt.get_relevant_category }} medicines</small>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'add_medicines' apt.id %}">
+                {% csrf_token %}
+                <div class="modal-body" style="max-height: 65vh; overflow-y: auto;">
+                    <p class="text-muted mb-3"><i class="bi bi-info-circle me-1"></i>Select medicines and set daily dosage for each.</p>
+
+                    {% for med in apt.relevant_medicines %}
+                    <div class="medicine-suggestion-card p-3 mb-2" id="medCard{{ apt.id }}_{{ med.id }}">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="form-check mt-1">
+                                <input class="form-check-input med-checkbox" type="checkbox" name="medicines" value="{{ med.id }}" id="med{{ apt.id }}_{{ med.id }}" onchange="toggleDosageFields(this, '{{ apt.id }}_{{ med.id }}')">
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <label class="form-check-label fw-bold" for="med{{ apt.id }}_{{ med.id }}" style="cursor:pointer;">{{ med.name }}</label>
+                                    <span class="badge-medicine-type">{{ med.med_type }}</span>
+                                    <span class="text-muted" style="font-size:0.8rem;">{{ med.dosage }}</span>
+                                </div>
+                                <p class="text-muted mb-2" style="font-size:0.8rem;">{{ med.description|default:"" }}</p>
+
+                                <!-- Dosage Fields (hidden until checked) -->
+                                <div class="dosage-fields" id="dosageFields{{ apt.id }}_{{ med.id }}" style="display:none;">
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label class="form-label" style="font-size:0.78rem; font-weight:600;">Frequency</label>
+                                            <select name="frequency_{{ med.id }}" class="form-select form-select-sm">
+                                                {% for val, label in frequency_choices %}
+                                                <option value="{{ val }}" {% if val == "Twice daily" %}selected{% endif %}>{{ val }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" style="font-size:0.78rem; font-weight:600;">Duration</label>
+                                            <select name="duration_{{ med.id }}" class="form-select form-select-sm">
+                                                {% for val, label in duration_choices %}
+                                                <option value="{{ val }}" {% if val == "5 days" %}selected{% endif %}>{{ val }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" style="font-size:0.78rem; font-weight:600;">Instructions</label>
+                                            <input type="text" name="instructions_{{ med.id }}" class="form-control form-control-sm" placeholder="e.g., After meals">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-circle me-2"></i>No medicines found for this category.
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill">
+                        <i class="bi bi-capsule me-1"></i> Prescribe & Complete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: var(--radius);">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius) var(--radius) 0 0;">
+                <h5 class="modal-title text-white"><i class="bi bi-person-gear me-2"></i>Edit Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'doctor_update_profile' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <input type="text" name="name" value="{{ doctor.name }}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Specialization</label>
+                        <input type="text" name="specialization" value="{{ doctor.specialization }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Experience (years)</label>
+                        <input type="number" name="experience" value="{{ doctor.experience }}" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill"><i class="bi bi-check-lg me-1"></i>Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle dosage fields when checkbox is checked/unchecked
+function toggleDosageFields(checkbox, id) {
+    const fields = document.getElementById('dosageFields' + id);
+    const card = document.getElementById('medCard' + id);
+    if (checkbox.checked) {
+        fields.style.display = 'block';
+        card.style.borderColor = 'var(--primary)';
+        card.style.background = 'rgba(13, 148, 136, 0.04)';
+    } else {
+        fields.style.display = 'none';
+        card.style.borderColor = '';
+        card.style.background = '';
+    }
+}
+
+// Count stats
+document.addEventListener('DOMContentLoaded', function() {
+    const rows = document.querySelectorAll('tbody tr');
+    let pending = 0, approved = 0, completed = 0;
+    rows.forEach(row => {
+        const badge = row.querySelector('.badge-status');
+        if (badge) {
+            const text = badge.textContent.trim();
+            if (text === 'Pending') pending++;
+            else if (text === 'Approved') approved++;
+            else if (text === 'Completed') completed++;
+        }
+    });
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('approvedCount').textContent = approved;
+    document.getElementById('completedCount').textContent = completed;
+});
+</script>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Medicines Directory - MedCare{% endblock %}
+{% block extra_css %}
+<style>
+.glass-hero{background:linear-gradient(135deg,rgba(13,148,136,0.85),rgba(79,70,229,0.85));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.18);border-radius:24px;padding:2.5rem;margin-bottom:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.12)}
+.glass-card{background:rgba(255,255,255,0.65);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.4);border-radius:20px;box-shadow:0 4px 24px rgba(0,0,0,0.06);margin-bottom:2rem;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.glass-card:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(0,0,0,0.1)}
+.glass-card-header{background:rgba(255,255,255,0.5);backdrop-filter:blur(10px);padding:1.2rem 1.5rem;border-bottom:1px solid rgba(255,255,255,0.3);display:flex;justify-content:space-between;align-items:center}
+.glass-card-header h5{font-weight:700;color:#1e293b;margin:0;font-size:1.15rem}
+.glass-pill{background:rgba(13,148,136,0.12);backdrop-filter:blur(8px);border:1px solid rgba(13,148,136,0.2);border-radius:50px;padding:.35rem 1rem;font-size:.8rem;font-weight:600;color:#0d9488;transition:all .2s;text-decoration:none;display:inline-block}
+.glass-pill:hover{background:rgba(13,148,136,0.9);color:#fff;transform:scale(1.05)}
+.glass-table{width:100%;border-collapse:separate;border-spacing:0}
+.glass-table thead th{background:rgba(241,245,249,0.8);backdrop-filter:blur(8px);padding:.8rem 1rem;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;border-bottom:1px solid rgba(226,232,240,0.6)}
+.glass-table tbody tr{transition:background .2s}
+.glass-table tbody tr:hover{background:rgba(13,148,136,0.04)}
+.glass-table td{padding:.75rem 1rem;border-bottom:1px solid rgba(226,232,240,0.4);font-size:.88rem;vertical-align:middle}
+.glass-badge{background:rgba(13,148,136,0.12);color:#0d9488;padding:.25rem .65rem;border-radius:50px;font-size:.72rem;font-weight:600;display:inline-block}
+.glass-search{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.5);border-radius:50px;padding:.6rem 1.2rem;font-size:.9rem;color:#334155;outline:none;transition:all .3s;width:260px}
+.glass-search:focus{border-color:rgba(13,148,136,0.5);box-shadow:0 0 0 3px rgba(13,148,136,0.1)}
+.glass-btn{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.5);border-radius:50px;padding:.5rem 1.5rem;font-weight:600;font-size:.88rem;color:#1e293b;transition:all .2s;cursor:pointer}
+.glass-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.glass-btn-primary{background:rgba(13,148,136,0.9);color:#fff;border-color:rgba(13,148,136,0.3)}
+.glass-btn-primary:hover{background:#0d9488;color:#fff}
+.glass-btn-sm{padding:.3rem .7rem;font-size:.78rem}
+.glass-modal .modal-content{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.3);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.glass-modal .modal-header{background:linear-gradient(135deg,rgba(13,148,136,0.9),rgba(79,70,229,0.9));border-radius:24px 24px 0 0;padding:1.3rem 1.5rem;border:none}
+.glass-count-badge{background:linear-gradient(135deg,#0d9488,#4f46e5);color:#fff;padding:.2rem .7rem;border-radius:50px;font-size:.75rem;font-weight:700;margin-left:.5rem}
+.cat-icon{width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;margin-right:.7rem}
+.ci-general{background:rgba(59,130,246,0.12);color:#3b82f6}
+.ci-dental{background:rgba(168,85,247,0.12);color:#a855f7}
+.ci-cardiology{background:rgba(239,68,68,0.12);color:#ef4444}
+.ci-ophthalmology{background:rgba(14,165,233,0.12);color:#0ea5e9}
+.ci-dermatology{background:rgba(249,115,22,0.12);color:#f97316}
+.ci-orthopedics{background:rgba(34,197,94,0.12);color:#22c55e}
+.ci-pediatrics{background:rgba(236,72,153,0.12);color:#ec4899}
+.ci-neurology{background:rgba(99,102,241,0.12);color:#6366f1}
+.ci-ent{background:rgba(234,179,8,0.12);color:#eab308}
+.ci-psychiatry{background:rgba(139,92,246,0.12);color:#8b5cf6}
+body{background:linear-gradient(180deg,#f0fdfa 0%,#ede9fe 50%,#f0f9ff 100%)!important;min-height:100vh}
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="glass-hero">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="text-white mb-1 fw-bold"><i class="bi bi-capsule me-2"></i>Medicines Directory</h2>
+                <p class="text-white-50 mb-0">{{ total_count }} medicines across {{ medicines_by_category|length }} categories &middot; Doctor Access Only</p>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+                <input type="text" id="searchInput" class="glass-search" placeholder="Search medicines...">
+                <button class="glass-btn" data-bs-toggle="modal" data-bs-target="#addMedicineModal"><i class="bi bi-plus-circle me-1"></i> Add Medicine</button>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        {% for cat_name, meds in medicines_by_category.items %}
+        <a href="#cat-{{ forloop.counter }}" class="glass-pill">{{ cat_name }} ({{ meds|length }})</a>
+        {% endfor %}
+    </div>
+    {% for cat_name, meds in medicines_by_category.items %}
+    <div class="glass-card" id="cat-{{ forloop.counter }}">
+        <div class="glass-card-header">
+            <h5>
+                <span class="cat-icon ci-{{ cat_name|lower }}"><i class="bi bi-capsule"></i></span>
+                {{ cat_name }} Medicines
+                <span class="glass-count-badge">{{ meds|length }}</span>
+            </h5>
+            <button class="glass-btn glass-btn-sm" onclick="toggleTable(this)"><i class="bi bi-chevron-up"></i></button>
+        </div>
+        <div class="table-responsive table-section">
+            <table class="glass-table medicine-table">
+                <thead><tr><th>#</th><th>Medicine Name</th><th>Type</th><th>Dosage</th><th>Description</th><th class="text-center">Actions</th></tr></thead>
+                <tbody>
+                    {% for med in meds %}
+                    <tr class="medicine-row">
+                        <td class="text-muted">{{ forloop.counter }}</td>
+                        <td><strong>{{ med.name }}</strong></td>
+                        <td><span class="glass-badge">{{ med.med_type }}</span></td>
+                        <td>{{ med.dosage }}</td>
+                        <td class="text-muted" style="font-size:0.82rem;max-width:280px">{{ med.description|default:"-" }}</td>
+                        <td class="text-center">
+                            <button class="glass-btn glass-btn-sm me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ med.id }}"><i class="bi bi-pencil"></i></button>
+                            <a href="{% url 'delete_medicine' med.id %}" class="glass-btn glass-btn-sm" style="color:#ef4444" onclick="return confirm('Delete this medicine?')"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% for med in meds %}
+    <div class="modal fade glass-modal" id="editModal{{ med.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white"><i class="bi bi-pencil-square me-2"></i>Edit {{ med.name }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST" action="{% url 'update_medicine' med.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3"><label class="form-label fw-semibold">Name</label><input type="text" name="name" value="{{ med.name }}" class="form-control" style="border-radius:12px" required></div>
+                        <div class="row mb-3">
+                            <div class="col-6"><label class="form-label fw-semibold">Type</label>
+                                <select name="med_type" class="form-select" style="border-radius:12px">
+                                    <option value="Tablet" {% if med.med_type == "Tablet" %}selected{% endif %}>Tablet</option>
+                                    <option value="Capsule" {% if med.med_type == "Capsule" %}selected{% endif %}>Capsule</option>
+                                    <option value="Syrup" {% if med.med_type == "Syrup" %}selected{% endif %}>Syrup</option>
+                                    <option value="Injection" {% if med.med_type == "Injection" %}selected{% endif %}>Injection</option>
+                                    <option value="Ointment" {% if med.med_type == "Ointment" %}selected{% endif %}>Ointment</option>
+                                    <option value="Drops" {% if med.med_type == "Drops" %}selected{% endif %}>Drops</option>
+                                    <option value="Inhaler" {% if med.med_type == "Inhaler" %}selected{% endif %}>Inhaler</option>
+                                </select>
+                            </div>
+                            <div class="col-6"><label class="form-label fw-semibold">Category</label>
+                                <select name="category" class="form-select" style="border-radius:12px">
+                                    <option value="General" {% if med.category == "General" %}selected{% endif %}>General</option>
+                                    <option value="Dental" {% if med.category == "Dental" %}selected{% endif %}>Dental</option>
+                                    <option value="Cardiology" {% if med.category == "Cardiology" %}selected{% endif %}>Cardiology</option>
+                                    <option value="Ophthalmology" {% if med.category == "Ophthalmology" %}selected{% endif %}>Ophthalmology</option>
+                                    <option value="Dermatology" {% if med.category == "Dermatology" %}selected{% endif %}>Dermatology</option>
+                                    <option value="Orthopedics" {% if med.category == "Orthopedics" %}selected{% endif %}>Orthopedics</option>
+                                    <option value="Pediatrics" {% if med.category == "Pediatrics" %}selected{% endif %}>Pediatrics</option>
+                                    <option value="Neurology" {% if med.category == "Neurology" %}selected{% endif %}>Neurology</option>
+                                    <option value="ENT" {% if med.category == "ENT" %}selected{% endif %}>ENT</option>
+                                    <option value="Psychiatry" {% if med.category == "Psychiatry" %}selected{% endif %}>Psychiatry</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Dosage</label><input type="text" name="dosage" value="{{ med.dosage }}" class="form-control" style="border-radius:12px" required></div>
+                        <div class="mb-3"><label class="form-label fw-semibold">Description</label><textarea name="description" class="form-control" rows="2" style="border-radius:12px">{{ med.description|default:"" }}</textarea></div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="glass-btn" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="glass-btn glass-btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+<div class="modal fade glass-modal" id="addMedicineModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white"><i class="bi bi-plus-circle me-2"></i>Add New Medicine</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'add_medicine' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label fw-semibold">Medicine Name</label><input type="text" name="name" class="form-control" style="border-radius:12px" placeholder="e.g. Paracetamol" required></div>
+                    <div class="row mb-3">
+                        <div class="col-6"><label class="form-label fw-semibold">Type</label>
+                            <select name="med_type" class="form-select" style="border-radius:12px" required>
+                                <option value="Tablet">Tablet</option><option value="Capsule">Capsule</option><option value="Syrup">Syrup</option>
+                                <option value="Injection">Injection</option><option value="Ointment">Ointment</option><option value="Drops">Drops</option><option value="Inhaler">Inhaler</option>
+                            </select>
+                        </div>
+                        <div class="col-6"><label class="form-label fw-semibold">Category</label>
+                            <select name="category" class="form-select" style="border-radius:12px" required>
+                                <option value="General">General</option><option value="Dental">Dental</option><option value="Cardiology">Cardiology</option>
+                                <option value="Ophthalmology">Ophthalmology</option><option value="Dermatology">Dermatology</option><option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option><option value="Neurology">Neurology</option><option value="ENT">ENT</option><option value="Psychiatry">Psychiatry</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Dosage</label><input type="text" name="dosage" class="form-control" style="border-radius:12px" placeholder="e.g. 500mg" required></div>
+                    <div class="mb-3"><label class="form-label fw-semibold">Description</label><textarea name="description" class="form-control" rows="2" style="border-radius:12px" placeholder="Brief description..."></textarea></div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="glass-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="glass-btn glass-btn-primary"><i class="bi bi-plus-lg me-1"></i>Add Medicine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.getElementById('searchInput').addEventListener('input',function(){var q=this.value.toLowerCase();document.querySelectorAll('.medicine-row').forEach(function(r){var n=r.querySelector('td:nth-child(2)').textContent.toLowerCase();var d=r.querySelector('td:nth-child(5)').textContent.toLowerCase();r.style.display=(n.indexOf(q)>=0||d.indexOf(q)>=0)?'':'none';});});
+function toggleTable(btn){var s=btn.closest('.glass-card').querySelector('.table-section');var i=btn.querySelector('i');if(s.style.display==='none'){s.style.display='';i.className='bi bi-chevron-up';}else{s.style.display='none';i.className='bi bi-chevron-down';}}
+</script>
+{% endblock %}
