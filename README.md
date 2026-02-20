@@ -1,3 +1,13 @@
+# LIVE DEMO AT 
+https://hospital-management-awi2.onrender.com/
+
+
+
+
+
+
+
+
 # 🏥 MedCare — Hospital Management System
 
 A full-stack **Django** hospital management system with patient appointments, doctor dashboards, and a comprehensive medicine directory with **1000+ medicines** across 10 medical specialties.
