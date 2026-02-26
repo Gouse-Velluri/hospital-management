@@ -9,7 +9,7 @@ A full-stack **Django** hospital management system with patient appointments, do
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python)
 ![Django](https://img.shields.io/badge/Django-5.2-green?logo=django)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
-
+Live : https://hospital-management-hrkp.onrender.com/
 ---
 
 ## ✨ Features
