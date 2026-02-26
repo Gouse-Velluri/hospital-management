@@ -25,14 +25,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', "django-insecure-gn4)40e3k6@@^s*zk9@!t9pmbjum%v_s*lrq4+aw=v&p!#@*o%")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'False'
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration for all deployments
 if os.environ.get('ALLOWED_HOSTS'):
     ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS').split(',') if h.strip()]
 else:
-    # Production domain for Render
-    ALLOWED_HOSTS = ['hospital-management-87dq.onrender.com']
+    # Development + Production domains
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        'hospital-management-87dq.onrender.com'
+    ]
 
 # Trust proxy headers for cloud deployments
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
