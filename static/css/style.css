@@ -1104,6 +1104,36 @@ h6 {
     }
 }
 
+/* === ADDITIONAL ALERT POPUP KEYFRAMES === */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideOutLeft {
+    0% {
+        width: 100%;
+    }
+    100% {
+        width: 0%;
+    }
+}
+
 /* === ENHANCED BUTTON STYLES WITH ANIMATIONS === */
 .btn {
     position: relative;
@@ -1235,6 +1265,321 @@ h6 {
 /* === SMOOTH SCROLL === */
 html {
     scroll-behavior: smooth;
+}
+
+/* === ALERT POPUP NOTIFICATION STYLES === */
+.alert-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.alert-popup-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.alert-popup {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(13, 148, 136, 0.2);
+    max-width: 500px;
+    width: 90%;
+    padding: 2rem;
+    animation: popInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-popup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--success);
+    animation: slideInLeft 0.5s ease;
+}
+
+/* Alert Types */
+.alert-popup.success::before {
+    background: var(--success);
+}
+
+.alert-popup.error::before {
+    background: var(--danger);
+}
+
+.alert-popup.warning::before {
+    background: var(--warning);
+}
+
+.alert-popup.info::before {
+    background: var(--secondary);
+}
+
+.alert-popup-content {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.alert-popup-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    animation: rotate 2s ease-in-out infinite;
+}
+
+.alert-popup.success .alert-popup-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.alert-popup.error .alert-popup-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.alert-popup.warning .alert-popup-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.alert-popup.info .alert-popup-icon {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--secondary);
+}
+
+.alert-popup-body {
+    flex: 1;
+}
+
+.alert-popup-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    font-family: "Outfit", sans-serif;
+}
+
+.alert-popup-message {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.alert-popup-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert-popup-close:hover {
+    color: var(--text-dark);
+    transform: rotate(90deg);
+}
+
+.alert-popup-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.alert-popup-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.alert-popup-btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.alert-popup-btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(13, 148, 136, 0.3);
+}
+
+.alert-popup-btn-secondary {
+    background: var(--bg-glass);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+}
+
+.alert-popup-btn-secondary:hover {
+    background: var(--border);
+}
+
+/* Progress Bar in Alert */
+.alert-popup-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--primary);
+    animation: slideOutLeft 3s ease-in-out forwards;
+}
+
+.alert-popup.success .alert-popup-progress {
+    background: var(--success);
+}
+
+.alert-popup.error .alert-popup-progress {
+    background: var(--danger);
+}
+
+.alert-popup.warning .alert-popup-progress {
+    background: var(--warning);
+}
+
+/* === TOAST NOTIFICATION STYLES === */
+.toast-container {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    pointer-events: none;
+}
+
+.toast-notification {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    min-width: 320px;
+    max-width: 450px;
+    animation: slideInRight 0.4s ease;
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast-notification::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--success);
+}
+
+.toast-notification.error::before {
+    background: var(--danger);
+}
+
+.toast-notification.warning::before {
+    background: var(--warning);
+}
+
+.toast-notification.info::before {
+    background: var(--secondary);
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.toast-notification.success .toast-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.toast-notification.error .toast-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.toast-notification.warning .toast-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.toast-notification.info .toast-icon {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--secondary);
+}
+
+.toast-message {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.toast-text {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    transition: var(--transition);
+}
+
+.toast-close:hover {
+    color: var(--text-dark);
+    transform: rotate(90deg);
 }
 
 /* === GRADIENT TEXT ANIMATIONS === */

@@ -12,25 +12,25 @@ const API_ENDPOINTS = {
     getStatistics: '/doctor/ajax/get-statistics/'
 };
 
-// Utility function to show notifications
+// Utility function to show notifications with beautiful alerts
 function showNotification(message, type = 'success') {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
-    alertDiv.setAttribute('role', 'alert');
-    alertDiv.innerHTML = `
-        <i class="bi bi-${type === 'error' ? 'exclamation-circle' : 'check-circle'} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    alertDiv.style.animation = 'slideInRight 0.4s ease';
+    if (window.Alert) {
+        const titles = {
+            success: 'Success',
+            error: 'Error',
+            warning: 'Warning',
+            info: 'Information'
+        };
 
-    const container = document.querySelector('.container-fluid') || document.body;
-    container.insertBefore(alertDiv, container.firstChild);
-
-    // Auto-close after 5 seconds
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
+        window.Alert.toast({
+            type: type,
+            title: titles[type] || 'Notification',
+            message: message
+        });
+    } else {
+        // Fallback to console if Alert system not loaded
+        console.log(`[${type}] ${message}`);
+    }
 }
 
 // Utility function to get CSRF token
