@@ -29,10 +29,14 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS configuration for all deployments
 if os.environ.get('ALLOWED_HOSTS'):
-    ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',')]
+    ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS').split(',') if h.strip()]
 else:
-    # Default for development and auto-configured for cloud platforms
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.onrender.com', '.amazonaws.com', '*']
+    # Auto-detect based on environment
+    if os.environ.get('RENDER'):  # Running on Render
+        ALLOWED_HOSTS = ['*']  # Render handles hostname validation
+    else:
+        # Default for development and other cloud platforms
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.onrender.com', '.amazonaws.com', '*']
 
 # Trust proxy headers for cloud deployments
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -42,7 +46,13 @@ USE_X_FORWARDED_PORT = True
 # CSRF settings for production
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 if os.environ.get('CSRF_TRUSTED_ORIGINS'):
-    CSRF_TRUSTED_ORIGINS.extend(os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(','))
+    CSRF_TRUSTED_ORIGINS.extend([o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS').split(',') if o.strip()])
+elif os.environ.get('RENDER'):
+    # Auto-add Render domain if available
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')}")
+    
+# Remove empty values
+CSRF_TRUSTED_ORIGINS = [x for x in CSRF_TRUSTED_ORIGINS if x]
 
 
 # Application definition
