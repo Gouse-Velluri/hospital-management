@@ -32,7 +32,7 @@ if os.environ.get('ALLOWED_HOSTS'):
     ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS').split(',') if h.strip()]
 else:
     # Production domain for Render
-    ALLOWED_HOSTS = ['hospital-management-trwt.onrender.com']
+    ALLOWED_HOSTS = ['hospital-management-87dq.onrender.com']
 
 # Trust proxy headers for cloud deployments
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
