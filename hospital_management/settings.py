@@ -31,28 +31,44 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 if os.environ.get('ALLOWED_HOSTS'):
     ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS').split(',') if h.strip()]
 else:
-    # Auto-detect based on environment
-    if os.environ.get('RENDER'):  # Running on Render
-        ALLOWED_HOSTS = ['*']  # Render handles hostname validation
-    else:
-        # Default for development and other cloud platforms
-        ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.onrender.com', '.amazonaws.com', '*']
+    # Allow all hosts - each platform has different ways of setting hostname
+    # Render, Heroku, AWS all set different env variables
+    ALLOWED_HOSTS = ['*']
 
 # Trust proxy headers for cloud deployments
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 
-# CSRF settings for production
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
+# CSRF settings - allow HTTPS from common domains
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://hospital-management-hrkp.onrender.com',  # Your Render domain
+    'https://*.onrender.com',
+    'https://*.herokuapp.com',
+    'https://*.amazonaws.com',
+]
+
+# Add custom CSRF origins from environment if provided
 if os.environ.get('CSRF_TRUSTED_ORIGINS'):
-    CSRF_TRUSTED_ORIGINS.extend([o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS').split(',') if o.strip()])
-elif os.environ.get('RENDER'):
-    # Auto-add Render domain if available
-    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')}")
-    
-# Remove empty values
-CSRF_TRUSTED_ORIGINS = [x for x in CSRF_TRUSTED_ORIGINS if x]
+    custom_origins = [o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS').split(',') if o.strip()]
+    CSRF_TRUSTED_ORIGINS.extend(custom_origins)
+
+# Remove duplicates and empty values
+CSRF_TRUSTED_ORIGINS = list(set([x for x in CSRF_TRUSTED_ORIGINS if x]))
+
+# Disable CSRF check for AJAX endpoints if needed (uncomment if having issues)
+# CSRF_COOKIE_SECURE = False  # Only for testing, should be True in production
+# SESSION_COOKIE_SECURE = False  # Only for testing, should be True in production
+
+# CSRF and Session Cookie settings for Render/Production
+CSRF_COOKIE_SECURE = False  # Set to True only if fully HTTPS
+SESSION_COOKIE_SECURE = False  # Set to True only if fully HTTPS
+CSRF_COOKIE_HTTPONLY = False  # JavaScript needs CSRF token
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 
 # Application definition
