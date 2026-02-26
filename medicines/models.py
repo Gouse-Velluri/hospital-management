@@ -1,6 +1,10 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 from patients.models import Patient
 from doctors.models import Doctor
+import random
+import string
 
 
 class Medicine(models.Model):
@@ -136,3 +140,29 @@ class Prescription(models.Model):
 
     def __str__(self):
         return f"{self.medicine.name} → {self.frequency} for {self.duration}"
+
+
+class ConfirmationCode(models.Model):
+    """Stores OTP codes for appointment cancellation confirmation."""
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='confirmation_codes')
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='confirmation_codes')
+    code = models.CharField(max_length=6, unique=True)
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = ''.join(random.choices(string.digits, k=6))
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(minutes=10)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f"OTP for {self.appointment.id} - {self.patient.name}"
+
+    class Meta:
+        ordering = ['-created_at']

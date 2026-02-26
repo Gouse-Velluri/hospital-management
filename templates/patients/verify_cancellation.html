@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Appointment Cancellation - MedCare{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="card-header-custom">
+            <div class="icon-circle" style="background-color: #ff6b6b;">
+                <i class="bi bi-shield-exclamation"></i>
+            </div>
+            <h2>Confirm Cancellation</h2>
+            <p>Enter the verification code sent to your email</p>
+        </div>
+
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle me-2"></i>
+            A 6-digit code has been sent to your registered email address. This code is valid for 10 minutes.
+        </div>
+
+        <div class="appointment-details mb-4">
+            <h5 class="mb-3">Appointment Details:</h5>
+            <div class="detail-row">
+                <span class="detail-label">Doctor:</span>
+                <span class="detail-value">Dr. {{ appointment.doctor.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Service:</span>
+                <span class="detail-value">{{ appointment.service }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Date & Time:</span>
+                <span class="detail-value">{{ appointment.date }} at {{ appointment.time }}</span>
+            </div>
+        </div>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="form-floating-custom">
+                <label for="id_code"><i class="bi bi-key me-1"></i> Verification Code</label>
+                <input type="text"
+                       id="id_code"
+                       name="code"
+                       class="form-control"
+                       placeholder="000000"
+                       maxlength="6"
+                       pattern="\d{6}"
+                       required
+                       inputmode="numeric">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger mt-3">
+                    <i class="bi bi-check-circle me-2"></i>Confirm Cancellation
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="text-muted mb-2">
+                Didn't receive the code? Check your spam folder or
+            </p>
+            <a href="{% url 'patient_dashboard' %}" class="link-custom">
+                <i class="bi bi-arrow-left me-1"></i>Go back to dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .appointment-details {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ff6b6b;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .detail-value {
+        color: #212529;
+    }
+
+    #id_code {
+        font-size: 24px;
+        letter-spacing: 8px;
+        text-align: center;
+        font-weight: bold;
+        font-family: 'Courier New', monospace;
+    }
+
+    #id_code::placeholder {
+        letter-spacing: 8px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!-- Add this script to your doctor dashboard template before closing body tag -->
+<script src="{% static 'js/doctor-ajax.js' %}"></script>
+
+<!-- Modify your appointment table rows to include data attributes: -->
+<!--
+Example table row structure:
+<tr data-appointment-id="{{ apt.id }}">
+    <td><strong>{{ apt.patient.name }}</strong></td>
+    <td>{{ apt.service }}</td>
+    <td>{{ apt.date|date:"M d, Y" }} · {{ apt.time|time:"h:i A" }}</td>
+    <td class="appointment-status">
+        {% if apt.status == "Pending" %}
+        <span class="badge-status badge-pending">Pending</span>
+        {% elif apt.status == "Approved" %}
+        <span class="badge-status badge-approved">Approved</span>
+        {% elif apt.status == "Completed" %}
+        <span class="badge-status badge-completed">Completed</span>
+        {% else %}
+        <span class="badge-status badge-cancelled">Cancelled</span>
+        {% endif %}
+    </td>
+    <td>
+        <div class="d-flex justify-content-center gap-1 flex-wrap">
+            {% if apt.status == "Pending" %}
+            <button class="btn btn-sm btn-outline-success rounded-pill"
+                data-action="approve"
+                data-appointment-id="{{ apt.id }}"
+                title="Approve">
+                <i class="bi bi-check-lg"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger rounded-pill"
+                data-action="reject"
+                data-appointment-id="{{ apt.id }}"
+                title="Reject">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            {% endif %}
+            {% if apt.status == "Approved" or apt.status == "Pending" %}
+            <button class="btn btn-sm btn-outline-primary rounded-pill"
+                data-bs-toggle="modal"
+                data-bs-target="#prescribeModal{{ apt.id }}"
+                title="Prescribe">
+                <i class="bi bi-capsule"></i>
+            </button>
+            {% endif %}
+            {% if apt.status == "Approved" %}
+            <button class="btn btn-sm btn-outline-success rounded-pill"
+                data-action="complete"
+                data-appointment-id="{{ apt.id }}"
+                title="Mark as Completed">
+                <i class="bi bi-check-all"></i>
+            </button>
+            {% endif %}
+            <a href="{% url 'doctor_delete_appointment' apt.id %}"
+                class="btn btn-sm btn-outline-danger rounded-pill"
+                onclick="return confirm('Delete this appointment?')"
+                title="Delete">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+-->

@@ -75,11 +75,11 @@
                 </thead>
                 <tbody>
                     {% for apt in appointments %}
-                    <tr>
+                    <tr data-appointment-id="{{ apt.id }}">
                         <td><strong>{{ apt.patient.name }}</strong></td>
                         <td>{{ apt.service }}</td>
                         <td>{{ apt.date|date:"M d, Y" }} · {{ apt.time|time:"h:i A" }}</td>
-                        <td>
+                        <td class="appointment-status">
                             {% if apt.status == "Pending" %}
                             <span class="badge-status badge-pending">Pending</span>
                             {% elif apt.status == "Approved" %}
@@ -108,16 +108,21 @@
                         <td class="text-center">
                             <div class="d-flex justify-content-center gap-1 flex-wrap">
                                 {% if apt.status == "Pending" %}
-                                <a href="{% url 'approve_appointment' apt.id %}" class="btn btn-sm btn-outline-success rounded-pill" title="Approve">
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-action="approve" data-appointment-id="{{ apt.id }}" title="Approve">
                                     <i class="bi bi-check-lg"></i>
-                                </a>
-                                <a href="{% url 'reject_appointment' apt.id %}" class="btn btn-sm btn-outline-danger rounded-pill" title="Reject">
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill" data-action="reject" data-appointment-id="{{ apt.id }}" title="Reject">
                                     <i class="bi bi-x-lg"></i>
-                                </a>
+                                </button>
                                 {% endif %}
                                 {% if apt.status == "Approved" or apt.status == "Pending" %}
                                 <button class="btn btn-sm btn-outline-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#prescribeModal{{ apt.id }}" title="Prescribe">
                                     <i class="bi bi-capsule"></i>
+                                </button>
+                                {% endif %}
+                                {% if apt.status == "Approved" %}
+                                <button class="btn btn-sm btn-outline-success rounded-pill" data-action="complete" data-appointment-id="{{ apt.id }}" title="Mark as Completed">
+                                    <i class="bi bi-check-all"></i>
                                 </button>
                                 {% endif %}
                                 <a href="{% url 'doctor_delete_appointment' apt.id %}" class="btn btn-sm btn-outline-danger rounded-pill" onclick="return confirm('Delete this appointment?')" title="Delete">
@@ -271,8 +276,9 @@ function toggleDosageFields(checkbox, id) {
 // Count stats
 document.addEventListener('DOMContentLoaded', function() {
     const rows = document.querySelectorAll('tbody tr');
-    let pending = 0, approved = 0, completed = 0;
+    let pending = 0, approved = 0, completed = 0, total = 0;
     rows.forEach(row => {
+        total++;
         const badge = row.querySelector('.badge-status');
         if (badge) {
             const text = badge.textContent.trim();
@@ -281,9 +287,13 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (text === 'Completed') completed++;
         }
     });
+    document.getElementById('totalCount').textContent = total;
     document.getElementById('pendingCount').textContent = pending;
     document.getElementById('approvedCount').textContent = approved;
     document.getElementById('completedCount').textContent = completed;
 });
 </script>
+
+<!-- Load AJAX Handler Script -->
+<script src="{% static 'js/doctor-ajax.js' %}"></script>
 {% endblock %}
