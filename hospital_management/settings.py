@@ -51,15 +51,15 @@ if os.environ.get('CSRF_TRUSTED_ORIGINS'):
     custom_origins = [o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS').split(',') if o.strip()]
     CSRF_TRUSTED_ORIGINS.extend(custom_origins)
 
-# Disable CSRF check for AJAX endpoints if needed (uncomment if having issues)
-# CSRF_COOKIE_SECURE = False  # Only for testing, should be True in production
-# SESSION_COOKIE_SECURE = False  # Only for testing, should be True in production
-
-# CSRF and Session Cookie settings for Render/Production
-CSRF_COOKIE_SECURE = False  # Set to True only if fully HTTPS
-SECSRF and Session Cookie settings for Render/Production (HTTPS enabled)
+# CSRF and Session Cookie settings for Render/Production (HTTPS enabled)
 CSRF_COOKIE_SECURE = True  # Render uses HTTPS
-SESSION_COOKIE_SECURE = True  # Render uses
+SESSION_COOKIE_SECURE = True  # Render uses HTTPS
+CSRF_COOKIE_HTTPONLY = False  # JavaScript needs CSRF token
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+
 # Application definition
 
 INSTALLED_APPS = [
