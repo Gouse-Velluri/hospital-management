@@ -43,7 +43,7 @@ USE_X_FORWARDED_PORT = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
-    'https://hospital-management-trwt.onrender.com',  # NEW Render domain
+    'https://hospital-management-87dq.onrender.com',  # NEW Render domain
 ]
 
 # Add custom CSRF origins from environment if provided
